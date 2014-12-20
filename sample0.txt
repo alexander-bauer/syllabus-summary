@@ -1,2 +1,2 @@
-The course ID is MATH221. It meets Tuesdays and Thursdays, starting at
-1:00 PM.
+The course ID is MATH221. It meets Tuesdays and Thursdays. Its start
+time is at 1:00 PM.
