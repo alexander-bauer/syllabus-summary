@@ -19,7 +19,12 @@ sentences = [nltk.pos_tag(nltk.word_tokenize(sentence)) \
     for sentence in raw_sentences]
 
 # Define a grammar, and identify the noun phrases in the sentences.
-chunk_parser = nltk.RegexpParser(r"NP: {((<DT>|<PRP\$>)?<JJ>*(<NN>|<NNP>)+|<PRP>)}")
+# TODO: Look into using exclusive grammars to discard prepositional
+# phrases, and such.
+chunk_parser = nltk.RegexpParser("""
+NP: {<PRP|NN|NNP|CD>+}
+NPR: {((<DT|PRP\$>)?<JJ>*(<NP|CC>)+)}
+""")
 
 trees = [chunk_parser.parse(sentence) for sentence in sentences]
 
