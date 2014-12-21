@@ -12,13 +12,43 @@ filename = sys.argv[1]
 with open(filename, 'r') as f:
     data = f.read()
 
+# I borrowed some fuzzy matching code from StreamHacker.
+# http://streamhacker.com/2011/10/31/fuzzy-string-matching-python/
+stemmer = nltk.stem.PorterStemmer()
+def normalize(string):
+    words = nltk.tokenize.wordpunct_tokenize(string.lower().strip())
+    return ' '.join([stemmer.stem(w) for w in words])
+
+# Instantiate a hacky-curried function so we can use edit distance to
+# compare strings. Note that the second string is not normalized.
+def edit_distance_to(string1):
+    string1 = normalize(string1)
+
+    def edit_distance(string2):
+        return nltk.edit_distance(string1, string2)
+
+    return edit_distance
+
+# Returns a tuple of (f(arg), arg)
+# TODO: This whole mess should be less functional
+def pair_with_f(f, arg):
+    return (f(arg), arg)
+
+# Declare a list of keywords we might be looking for in the subjects of
+# sentences in input.
+compare_threshold = 3
+keywordlist = [ "course id", "start time" ]
+
+# Keep a list of any usable information we gather.
+
 # Break the input down into sentences, then into words, and position tag
 # those words.
 raw_sentences = nltk.sent_tokenize(data)
 sentences = [nltk.pos_tag(nltk.word_tokenize(sentence)) \
     for sentence in raw_sentences]
 
-# Define a grammar, and identify the noun phrases in the sentences.
+# Define a grammar, and identify the Noun Pairs and Noun PhRases in the
+# sentences.
 # TODO: Look into using exclusive grammars to discard prepositional
 # phrases, and such.
 chunk_parser = nltk.RegexpParser("""
@@ -34,6 +64,39 @@ for index, tree in enumerate(trees):
     for subtree in tree.subtrees(filter = lambda t: t.label() == 'NPR'):
         print("  %s" % subtree)
 
+    # Now, parse the key elements, identifying the subject and
+    # object(s).
     print("Key elements:")
+    subjectkw = None
+    objects = []
     for subtree in tree.subtrees(filter = lambda t: t.label() == 'NP'):
-        print("  %s" % ' '.join(word for (word, tag) in subtree.leaves()))
+
+        # Return the element to string form, and then try to compare it
+        # with the keyword list, if a subject has not already been
+        # found.
+        as_string = ' '.join(word for (word, tag) in subtree.leaves())
+
+        if not subjectkw:
+            # Sort the list of keywords based on how closely they
+            # compare to our subject candidate, along with the exactly
+            # how close they are to the subject letterwise, and select
+            # the first element.
+            # TODO: This is obscure. If anyone else has the misfortune
+            # of reading this code, I apologize. I should not be writing
+            # Haskell in Python.
+            distance, keyword = sorted([pair_with_f(
+                edit_distance_to(as_string), keyword) for keyword in
+                keywordlist])[0]
+
+            # If the distance is not over the threshold, mark this as
+            # the subject.
+            if distance <= compare_threshold:
+                subjectkw = keyword
+                sentencepart = 'Subject'
+            else:
+                sentencepart = 'Unusable'
+
+        else:
+            sentencepart = 'Object'
+
+        print("  %-16s - %s" % (as_string, sentencepart))
