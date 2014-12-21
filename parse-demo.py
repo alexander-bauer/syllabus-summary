@@ -37,10 +37,11 @@ def pair_with_f(f, arg):
 # Declare a list of keywords we might be looking for in the subjects of
 # sentences in input.
 compare_threshold = 3
-keywordlist = [ "course id", "start time" ]
+keywordlist = [ "course id", "start time", "end time", "meeting days",
+"email", "name" ]
 
 # Keep a list of any usable information we gather.
-information_gathered = []
+information_gathered = {}
 
 # Break the input down into sentences, then into words, and position tag
 # those words.
@@ -110,10 +111,10 @@ for index, tree in enumerate(trees):
     # Record the subject and objects from this sentence, if they are
     # both nonempty.
     if subjectkw and len(objects) > 0:
-        information_gathered.append((subjectkw, objects))
+        information_gathered[subjectkw] = objects
 
 
 # At the end, print out information we successfully gathered.
 print("\n\n=======\nInformation Gathered:\n")
-for field, data in information_gathered:
+for field, data in information_gathered.items():
     print("%s: %s" % (field, ', '.join(data)))
