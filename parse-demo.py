@@ -31,5 +31,9 @@ trees = [chunk_parser.parse(sentence) for sentence in sentences]
 for index, tree in enumerate(trees):
     print("===\nSentence: %s\nNoun phrases:" %
             raw_sentences[index].replace('\n', ' '))
-    for subtree in tree.subtrees(filter = lambda t: t.label() == 'NP'):
+    for subtree in tree.subtrees(filter = lambda t: t.label() == 'NPR'):
         print("  %s" % subtree)
+
+    print("Key elements:")
+    for subtree in tree.subtrees(filter = lambda t: t.label() == 'NP'):
+        print("  %s" % ' '.join(wordtag[0] for wordtag in subtree.leaves()))
