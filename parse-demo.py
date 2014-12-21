@@ -40,6 +40,7 @@ compare_threshold = 3
 keywordlist = [ "course id", "start time" ]
 
 # Keep a list of any usable information we gather.
+information_gathered = []
 
 # Break the input down into sentences, then into words, and position tag
 # those words.
@@ -97,6 +98,22 @@ for index, tree in enumerate(trees):
                 sentencepart = 'Unusable'
 
         else:
+            # Here, we might try to parse the data further, according to
+            # exactly what information we're looking for from the
+            # object, such as a time, a date, or an email address. But
+            # we won't, in this demo.
+            objects.append(as_string)
             sentencepart = 'Object'
 
         print("  %-16s - %s" % (as_string, sentencepart))
+
+    # Record the subject and objects from this sentence, if they are
+    # both nonempty.
+    if subjectkw and len(objects) > 0:
+        information_gathered.append((subjectkw, objects))
+
+
+# At the end, print out information we successfully gathered.
+print("\n\n=======\nInformation Gathered:\n")
+for field, data in information_gathered:
+    print("%s: %s" % (field, ', '.join(data)))
