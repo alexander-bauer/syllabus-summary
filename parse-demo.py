@@ -36,4 +36,4 @@ for index, tree in enumerate(trees):
 
     print("Key elements:")
     for subtree in tree.subtrees(filter = lambda t: t.label() == 'NP'):
-        print("  %s" % ' '.join(wordtag[0] for wordtag in subtree.leaves()))
+        print("  %s" % ' '.join(word for (word, tag) in subtree.leaves()))
