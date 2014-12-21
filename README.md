@@ -69,3 +69,4 @@ pre-determined threshold.
 ## Sources of Information
 
 http://thetokenizer.com/2013/05/09/efficient-way-to-extract-the-main-topics-of-a-sentence/
+http://streamhacker.com/2011/10/31/fuzzy-string-matching-python/
