@@ -1,1 +1,1 @@
-__all__ = [ 'tokenize', 'compare' ]
+__all__ = [ 'tokenize', 'compare', 'grammar' ]

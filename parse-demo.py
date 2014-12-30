@@ -4,6 +4,7 @@ import sys, os
 import nltk
 import parser.tokenize
 import parser.compare
+import parser.grammar
 
 if len(sys.argv) < 2:
     print("Please supply a filename.")
@@ -44,16 +45,7 @@ raw_sentences = parser.tokenize.split_phrases(data)
 sentences = parser.tokenize.part_of_speech_tag(
         parser.tokenize.split_words(raw_sentences))
 
-# Define a grammar, and identify the Noun Pairs and Noun PhRases in the
-# sentences.
-# TODO: Look into using exclusive grammars to discard prepositional
-# phrases, and such.
-chunk_parser = nltk.RegexpParser("""
-NP: {<PRP|NN|NNP|CD>+}
-NPR: {((<DT|PRP\$>)?<JJ>*(<NP|CC>)+)}
-""")
-
-trees = [chunk_parser.parse(sentence) for sentence in sentences]
+trees = parser.grammar.identify_constructs(sentences)
 
 for index, tree in enumerate(trees):
     print("===\nSentence: %s\nNoun phrases:" %
