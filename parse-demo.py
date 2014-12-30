@@ -2,6 +2,8 @@
 
 import sys, os
 import nltk
+import parser.tokenize
+import parser.compare
 
 if len(sys.argv) < 2:
     print("Please supply a filename.")
@@ -11,13 +13,6 @@ filename = sys.argv[1]
 
 with open(filename, 'r') as f:
     data = f.read()
-
-# I borrowed some fuzzy matching code from StreamHacker.
-# http://streamhacker.com/2011/10/31/fuzzy-string-matching-python/
-stemmer = nltk.stem.PorterStemmer()
-def normalize(string):
-    words = nltk.tokenize.wordpunct_tokenize(string.lower().strip())
-    return ' '.join([stemmer.stem(w) for w in words])
 
 # Instantiate a hacky-curried function so we can use edit distance to
 # compare strings. Note that the second string is not normalized.
@@ -45,9 +40,9 @@ information_gathered = {}
 
 # Break the input down into sentences, then into words, and position tag
 # those words.
-raw_sentences = nltk.sent_tokenize(data)
-sentences = [nltk.pos_tag(nltk.word_tokenize(sentence)) \
-    for sentence in raw_sentences]
+raw_sentences = parser.tokenize.split_phrases(data)
+sentences = parser.tokenize.part_of_speech_tag(
+        parser.tokenize.split_words(raw_sentences))
 
 # Define a grammar, and identify the Noun Pairs and Noun PhRases in the
 # sentences.
@@ -79,20 +74,22 @@ for index, tree in enumerate(trees):
         as_string = ' '.join(word for (word, tag) in subtree.leaves())
 
         if not subjectkw:
+            # Define a convenience function for comparing one
+            # already-normalized string with many others.
+            def compare_to_subj(string):
+                return parser.compare.compare_metric(as_string, string,
+                        normalized1 = True)
+
             # Sort the list of keywords based on how closely they
             # compare to our subject candidate, along with the exactly
             # how close they are to the subject letterwise, and select
             # the first element.
-            # TODO: This is obscure. If anyone else has the misfortune
-            # of reading this code, I apologize. I should not be writing
-            # Haskell in Python.
-            distance, keyword = sorted([pair_with_f(
-                edit_distance_to(as_string), keyword) for keyword in
-                keywordlist])[0]
 
-            # If the distance is not over the threshold, mark this as
-            # the subject.
-            if distance <= compare_threshold:
+            keyword = sorted(keywordlist, key = compare_to_subj)[0]
+            # If even the best keyword doesn't compare to the subject,
+            # drop it.
+            if parser.compare.compare(as_string, keyword, normalized1 =
+                    True):
                 subjectkw = keyword
                 sentencepart = 'Subject'
             else:
