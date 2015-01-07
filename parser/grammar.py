@@ -5,7 +5,8 @@ import nltk
 # TODO: Look into using exclusive grammars to discard prepositional
 # phrases, and such.
 _chunk_parser_ = nltk.RegexpParser("""
-NP: {<PRP|NN|NNP|CD>+}
+EMAIL: {<NN><:><JJ>}
+NP: {<PRP|NN|NNP|CD|EMAIL>+}
 NPR: {((<DT|PRP\$>)?<JJ>*(<NP|CC>)+)}
 """)
 
