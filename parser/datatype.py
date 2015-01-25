@@ -45,10 +45,44 @@ class DataType(list):
 
         return "[ " + ', '.join([str(d) for d in self]) + " ]"
 
-class TimeData(DataType):
+class Time(DataType):
     def __init__(self, nargs = 1):
         super().__init__(self._constructor, nargs)
 
     @staticmethod
     def _constructor(string):
         return datetime.datetime.strptime(string, "%I:%M %p").time()
+
+class Date(DataType):
+    def __init__(self, nargs = 1):
+        super().__init__(self._constructor, nargs)
+
+    @staticmethod
+    def _constructor(string):
+        return datetime.datetime.strptime(string, "%Y-%m-%d").date()
+
+class Weekday(DataType):
+
+    class UnknownWeekday(Exception): pass
+    def __init__(self, nargs = 1):
+        super().__init__(self._constructor, nargs)
+
+    @staticmethod
+    def _constructor(string):
+        return string
+
+class Email(DataType):
+    def __init__(self, nargs = 1):
+        super().__init__(self._constructor, nargs)
+
+    @staticmethod
+    def _constructor(string):
+        return string.replace(' ', '')
+
+class CourseID(DataType):
+    def __init__(self, nargs = 1):
+        super().__init__(self._constructor, nargs)
+
+    @staticmethod
+    def _constructor(string):
+        return string.replace(' ', '')

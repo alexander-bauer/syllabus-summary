@@ -23,15 +23,19 @@ with open(filename, 'r') as f:
 compare_threshold = 3
 keywordlist = keyword.KeywordList([
     keyword.Keyword("course id", "catalog id",
-        datamodel = datatype.DataType(None, 1)),
+        datamodel = datatype.CourseID(1)),
+    keyword.Keyword("start date", "start day",
+        datamodel = datatype.Date(1)),
+    keyword.Keyword("end date", "end day",
+        datamodel = datatype.Date(1)),
     keyword.Keyword("start time", "begin time", "meeting time", "starts",
-        datamodel = datatype.TimeData(1)),
+        datamodel = datatype.Time(1)),
     keyword.Keyword("end time", "ends",
-        datamodel = datatype.TimeData(1)),
+        datamodel = datatype.Time(1)),
     keyword.Keyword("meeting days",
-        datamodel = datatype.DataType(None, 7)),
+        datamodel = datatype.Weekday(7)),
     keyword.Keyword("email",
-        datamodel = datatype.DataType(None, 1)),
+        datamodel = datatype.Email(1)),
     keyword.Keyword("name", "professor", "teacher",
         datamodel = datatype.DataType(None, 1))
     ])
