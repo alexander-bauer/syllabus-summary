@@ -14,15 +14,15 @@ class Keyword:
 DataType (did you remember to construct one?): %s" % datamodel)
         self.datatype = datamodel
 
-        if not normalized:
+        if normalized:
             self.primary = word
             self.words = [self.primary]
             self.words.extend(alternatives)
         else:
-            self.primary = normalize(word)
+            self.primary = compare.normalize(word)
             self.words = [self.primary]
-            self.words.extend([normalize(alt) for alt in
-                alternaties])
+            self.words.extend([compare.normalize(alt) for alt in
+                alternatives])
 
     def match(self, wordcompare, normalized = False):
         """Return the best match to the word or function, if any are
