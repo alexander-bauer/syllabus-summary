@@ -6,8 +6,10 @@ import nltk
 # phrases, and such.
 _chunk_parser_ = nltk.RegexpParser("""
 EMAIL: {<NN><:><JJ>}
-VP: {<VBZ><NN>?}
-NP: {<PRP|NN|NNP|CD|EMAIL>+}
+V: {<RB|RBR|RBS>*<VB|VBD|VBN|VBP|VBZ>}
+N: {<NN|NNS|NNP|NNPS|CD|EMAIL>+}
+NP: {<DT|PRP>?<N>}
+VP: {<V><NP>?}
 NPR: {((<DT|PRP\$>)?<JJ>*(<NP|CC>)+)}
 """)
 

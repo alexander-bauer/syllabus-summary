@@ -50,8 +50,8 @@ for index, tree in enumerate(trees):
     print("Key elements:")
     subjectkw = None
     objects = []
-    for subtree in tree.subtrees(filter = lambda t: t.label() == 'NP' or
-            t.label() == 'VP'):
+    for subtree in tree.subtrees(filter = lambda t: t.label() == 'N' or
+            t.label() == 'V'):
 
         # Return the element to string form, and then try to compare it
         # with the keyword list, if a subject has not already been
@@ -75,13 +75,17 @@ for index, tree in enumerate(trees):
             else:
                 sentencepart = 'Unusable'
 
-        else:
+        # Only mark it an object if it's a noun.
+        elif subtree.label() == 'N':
             # Here, we might try to parse the data further, according to
             # exactly what information we're looking for from the
             # object, such as a time, a date, or an email address. But
             # we won't, in this demo.
             objects.append(as_string)
             sentencepart = 'Object'
+
+        else:
+            sentencepart = 'Verb'
 
         print("  %-16s - %s" % (as_string, sentencepart))
 
