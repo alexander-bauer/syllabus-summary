@@ -19,8 +19,8 @@ DataType (did you remember to construct one?): %s" % datamodel)
             self.words = [self.primary]
             self.words.extend(alternatives)
         else:
-            self.primary = compare.normalize(word)
-            self.words = [self.primary]
+            self.primary = word
+            self.words = [compare.normalize(self.primary)]
             self.words.extend([compare.normalize(alt) for alt in
                 alternatives])
 
