@@ -6,6 +6,8 @@ import parser.tokenize
 import parser.compare
 import parser.grammar
 import parser.keyword as keyword
+import parser.sentence
+import parser.datatype as datatype
 
 if len(sys.argv) < 2:
     print("Please supply a filename.")
@@ -20,12 +22,19 @@ with open(filename, 'r') as f:
 # sentences in input.
 compare_threshold = 3
 keywordlist = keyword.KeywordList([
-    keyword.Keyword("course id", "catalog id"),
-    keyword.Keyword("start time", "begin time", "meeting time", "starts"),
-    keyword.Keyword("end time"),
-    keyword.Keyword("meeting days"),
-    keyword.Keyword("email"),
-    keyword.Keyword("name", "professor", "teacher")])
+    keyword.Keyword("course id", "catalog id",
+        datamodel = datatype.DataType(None, 1)),
+    keyword.Keyword("start time", "begin time", "meeting time", "starts",
+        datamodel = datatype.TimeData(1)),
+    keyword.Keyword("end time", "ends",
+        datamodel = datatype.TimeData(1)),
+    keyword.Keyword("meeting days",
+        datamodel = datatype.DataType(None, 7)),
+    keyword.Keyword("email",
+        datamodel = datatype.DataType(None, 1)),
+    keyword.Keyword("name", "professor", "teacher",
+        datamodel = datatype.DataType(None, 1))
+    ])
 
 # Keep a list of any usable information we gather.
 information_gathered = {}
@@ -48,8 +57,7 @@ for index, tree in enumerate(trees):
     # Now, parse the key elements, identifying the subject and
     # object(s).
     print("Key elements:")
-    subjectkw = None
-    objects = []
+    sentencemodel = parser.sentence.Sentence(keywordlist)
     for subtree in tree.subtrees(filter = lambda t: t.label() == 'N' or
             t.label() == 'V'):
 
@@ -58,44 +66,27 @@ for index, tree in enumerate(trees):
         # found.
         as_string = ' '.join(word for (word, tag) in subtree.leaves())
 
-        if not subjectkw:
-            # Sort the list of keywords based on how closely they
-            # compare to our subject candidate, along with the exactly
-            # how close they are to the subject letterwise, and select
-            # the first element.
-
-            score, kw = keywordlist.match(as_string, normalized =
-                    True)
-
-            # If even the best keyword doesn't compare to the subject,
-            # drop it.
-            if kw != None:
-                subjectkw = kw.primary
-                sentencepart = 'Subject'
-            else:
-                sentencepart = 'Unusable'
-
-        # Only mark it an object if it's a noun.
-        elif subtree.label() == 'N':
-            # Here, we might try to parse the data further, according to
-            # exactly what information we're looking for from the
-            # object, such as a time, a date, or an email address. But
-            # we won't, in this demo.
-            objects.append(as_string)
-            sentencepart = 'Object'
-
+        # If the subtree is a verb, then it cannot be an object, so try
+        # to add it as a subject. Otherwise, add it as either.
+        if subtree.label() == 'V':
+            sentencepart = sentencemodel.new_subject(as_string)
         else:
-            sentencepart = 'Verb'
+            print(as_string)
+            sentencepart = sentencemodel.include_word(as_string)
+
+        if not sentencepart:
+            sentencepart = 'Unusable'
 
         print("  %-16s - %s" % (as_string, sentencepart))
 
     # Record the subject and objects from this sentence, if they are
     # both nonempty.
-    if subjectkw and len(objects) > 0:
-        information_gathered[subjectkw] = objects
+    if sentencemodel.keyword != None and len(sentencemodel.data) > 0:
+        information_gathered[sentencemodel.keyword.primary] = \
+            sentencemodel.data
 
 
 # At the end, print out information we successfully gathered.
 print("\n\n=======\nInformation Gathered:\n")
 for field, data in information_gathered.items():
-    print("%s: %s" % (field, ', '.join(data)))
+    print("%s: %s" % (field, data))
