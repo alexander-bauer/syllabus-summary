@@ -35,12 +35,12 @@ def pair_with_f(f, arg):
 # sentences in input.
 compare_threshold = 3
 keywordlist = keyword.KeywordList([
-                keyword.Keyword("course id"),
-                keyword.Keyword("start time"),
-                keyword.Keyword("end time"),
-                keyword.Keyword("meeting days"),
-                keyword.Keyword("email"),
-                keyword.Keyword("name")])
+    keyword.Keyword("course id", "catalog id"),
+    keyword.Keyword("start time", "begin time", "meeting time"),
+    keyword.Keyword("end time"),
+    keyword.Keyword("meeting days"),
+    keyword.Keyword("email"),
+    keyword.Keyword("name", "professor", "teacher")])
 
 # Keep a list of any usable information we gather.
 information_gathered = {}
@@ -58,6 +58,7 @@ for index, tree in enumerate(trees):
             raw_sentences[index].replace('\n', ' '))
     for subtree in tree.subtrees(filter = lambda t: t.label() == 'NPR'):
         print("  %s" % subtree)
+    print(tree)
 
     # Now, parse the key elements, identifying the subject and
     # object(s).
