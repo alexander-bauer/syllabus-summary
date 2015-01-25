@@ -1,8 +1,19 @@
 import types
 from parser import compare
+from parser import sentence
+from parser import datatype
 
 class Keyword:
-    def __init__(self, word, *alternatives, normalized = False):
+    class DataModelIncomplete(Exception): pass
+
+    def __init__(self, word, *alternatives, datamodel = None, normalized
+            = False):
+        if datamodel != None and not issubclass(type(datamodel),
+                datatype.DataType):
+            raise self.DataModelIncomplete("Data model not instance of \
+DataType (did you remember to construct one?): %s" % datamodel)
+        self.datatype = datamodel
+
         if not normalized:
             self.primary = word
             self.words = [self.primary]
