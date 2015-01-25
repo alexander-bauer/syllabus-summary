@@ -16,21 +16,6 @@ filename = sys.argv[1]
 with open(filename, 'r') as f:
     data = f.read()
 
-# Instantiate a hacky-curried function so we can use edit distance to
-# compare strings. Note that the second string is not normalized.
-def edit_distance_to(string1):
-    string1 = normalize(string1)
-
-    def edit_distance(string2):
-        return nltk.edit_distance(string1, string2)
-
-    return edit_distance
-
-# Returns a tuple of (f(arg), arg)
-# TODO: This whole mess should be less functional
-def pair_with_f(f, arg):
-    return (f(arg), arg)
-
 # Declare a list of keywords we might be looking for in the subjects of
 # sentences in input.
 compare_threshold = 3
