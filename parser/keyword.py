@@ -4,12 +4,12 @@ from parser import compare
 class Keyword:
     def __init__(self, word, *alternatives, normalized = False):
         if not normalized:
-            self.keyword = word
-            self.words = [self.keyword]
+            self.primary = word
+            self.words = [self.primary]
             self.words.extend(alternatives)
         else:
-            self.keyword = normalize(word)
-            self.words = [self.keyword]
+            self.primary = normalize(word)
+            self.words = [self.primary]
             self.words.extend([normalize(alt) for alt in
                 alternaties])
 
@@ -38,9 +38,35 @@ class Keyword:
 
         # If there are no matches, return None.
         if len(proximity_words) == 0:
-            return None
+            return None, None
 
         # Pick the best tuple of (score, word) using the proximity
         # as the key, and return the word.
         score, word = min(proximity_words, key = lambda pair: pair[0])
-        return word
+        return (score, word)
+
+class KeywordList(list):
+    def __init__(self, keyword_list):
+        self.kwlist = keyword_list
+
+    def match(self, wordcompare, normalized = False):
+        """Find the best match among all the listed keywords, if
+        present. Return the matching Keyword object and its score."""
+
+        # If wordcompare is a function, then it is already curried.
+        # Otherwise, curry it.
+        if type(wordcompare) == types.FunctionType:
+            comparefunc = wordcompare
+        else:
+            comparefunc = compare.compare_to(wordcompare, normalized)
+
+        proximity_keywords = []
+        for kw in self.kwlist:
+            score, word = kw.match(comparefunc)
+            if word != None:
+                proximity_keywords.append((score, kw))
+
+        if len(proximity_keywords) == 0:
+            return None, None
+
+        return min(proximity_keywords, key = lambda pair: pair[0])

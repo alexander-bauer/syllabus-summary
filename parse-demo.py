@@ -5,6 +5,7 @@ import nltk
 import parser.tokenize
 import parser.compare
 import parser.grammar
+import parser.keyword as keyword
 
 if len(sys.argv) < 2:
     print("Please supply a filename.")
@@ -33,8 +34,13 @@ def pair_with_f(f, arg):
 # Declare a list of keywords we might be looking for in the subjects of
 # sentences in input.
 compare_threshold = 3
-keywordlist = [ "course id", "start time", "end time", "meeting days",
-"email", "name" ]
+keywordlist = keyword.KeywordList([
+                keyword.Keyword("course id"),
+                keyword.Keyword("start time"),
+                keyword.Keyword("end time"),
+                keyword.Keyword("meeting days"),
+                keyword.Keyword("email"),
+                keyword.Keyword("name")])
 
 # Keep a list of any usable information we gather.
 information_gathered = {}
@@ -66,23 +72,18 @@ for index, tree in enumerate(trees):
         as_string = ' '.join(word for (word, tag) in subtree.leaves())
 
         if not subjectkw:
-            # Define a convenience function for comparing one
-            # already-normalized string with many others.
-            def compare_to_subj(string):
-                return parser.compare.compare_metric(as_string, string,
-                        normalized1 = True)
-
             # Sort the list of keywords based on how closely they
             # compare to our subject candidate, along with the exactly
             # how close they are to the subject letterwise, and select
             # the first element.
 
-            keyword = sorted(keywordlist, key = compare_to_subj)[0]
+            score, kw = keywordlist.match(as_string, normalized =
+                    True)
+
             # If even the best keyword doesn't compare to the subject,
             # drop it.
-            if parser.compare.compare(as_string, keyword, normalized1 =
-                    True):
-                subjectkw = keyword
+            if kw != None:
+                subjectkw = kw.primary
                 sentencepart = 'Subject'
             else:
                 sentencepart = 'Unusable'
