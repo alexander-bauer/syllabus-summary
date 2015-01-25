@@ -21,7 +21,7 @@ with open(filename, 'r') as f:
 compare_threshold = 3
 keywordlist = keyword.KeywordList([
     keyword.Keyword("course id", "catalog id"),
-    keyword.Keyword("start time", "begin time", "meeting time"),
+    keyword.Keyword("start time", "begin time", "meeting time", "starts"),
     keyword.Keyword("end time"),
     keyword.Keyword("meeting days"),
     keyword.Keyword("email"),
@@ -50,7 +50,8 @@ for index, tree in enumerate(trees):
     print("Key elements:")
     subjectkw = None
     objects = []
-    for subtree in tree.subtrees(filter = lambda t: t.label() == 'NP'):
+    for subtree in tree.subtrees(filter = lambda t: t.label() == 'NP' or
+            t.label() == 'VP'):
 
         # Return the element to string form, and then try to compare it
         # with the keyword list, if a subject has not already been
