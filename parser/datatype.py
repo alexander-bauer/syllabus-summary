@@ -1,4 +1,5 @@
 import datetime
+import copy
 
 class DataType(list):
     """Used to represent an abstract type of data that might be given in
@@ -7,7 +8,11 @@ class DataType(list):
     or a day of the week. There may also be a maximum number of fields,
     so a start time might have at most one argument, and meeting days
     might be 7 at most, but exam dates might be arbitrarily many. To
-    allow arbitrarily many fields, use 0"""
+    allow arbitrarily many fields, use 0.
+
+    A copy of any DataType may be produced by calling the object. For
+    example, a Keyword may set its datatype as `CourseID(nargs = 1)`. To
+    recieve a copy of that, use `keyword.datatype()`."""
 
     class ConstructorNonFunction(Exception): pass
     class InvalidNArgs(Exception): pass
@@ -26,6 +31,14 @@ class DataType(list):
 
         self.construct = construct
         self.nargs = nargs
+
+    # Return a newly-constructed copy of the same object. This allows us
+    # to use an instance as its own factory.
+    #
+    # If you are trying to debug anything that leads you to read this
+    # sentence, I'm so sorry.
+    def __call__(self):
+        return copy.deepcopy(self)
 
     def enter_data(self, string):
         if self.nargs and len(self) >= self.nargs:
