@@ -28,5 +28,4 @@ def independent_clauses(sentences):
     for tree in trees:
         clauses.extend(tree.subtrees(lambda t: t.label() == "INDEP"))
 
-    print(clauses)
     return clauses
