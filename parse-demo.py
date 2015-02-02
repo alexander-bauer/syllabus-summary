@@ -26,7 +26,7 @@ keywordlist = keyword.KeywordList([
         datamodel = datatype.CourseID(1)),
     keyword.Keyword("start date", "start day", "starts",
         datamodel = datatype.Date(1)),
-    keyword.Keyword("end date", "end day",
+    keyword.Keyword("end date", "end day", "ends",
         datamodel = datatype.Date(1)),
     keyword.Keyword("start time", "begin time", "meeting time", "starts",
         datamodel = datatype.Time(1)),
