@@ -1,4 +1,4 @@
-The catalogue ID is MATH 221. The start date is 2015-01-26, and the end
-date is 2015-05-26. Its meeting days are Tuesdays, Wednesdays, and
-Thursdays. It starts at 1:00 PM. The end time is at 2:15 PM.  The
-professor is Dr.  Jacob Kogan.  His email is xxx@umbc.edu.
+The catalogue ID is MATH 221. It starts on 2015-01-26, and the end date
+is 2015-05-26. Its meeting days are Tuesdays, Wednesdays, and Thursdays.
+It starts at 1:00 PM. The end time is at 2:15 PM.  The professor is Dr.
+Jacob Kogan.  His email is xxx@umbc.edu.
