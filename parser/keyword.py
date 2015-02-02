@@ -74,6 +74,12 @@ DataType (did you remember to construct one?): %s" % datamodel)
         """Return a datatype instance for this keyword."""
         return self._datatype()
 
+    def __str__(self):
+        return str(self.primary)
+
+    def __repr__(self):
+        return "Keyword(%s)" % self
+
 class KeywordList(list):
     def __init__(self, keyword_list):
         self.kwlist = keyword_list

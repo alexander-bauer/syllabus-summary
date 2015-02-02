@@ -65,6 +65,8 @@ for tree in trees:
     # Re-process the sentence until we can get some data out of it.
     # Usually, we'll break on the first try.
     while True:
+        if sentencemodel.keyword:
+            print("Re-interpreting keyword: %s" % sentencemodel.keyword)
         for subtree in tree.subtrees(filter = lambda t: t.label() == 'N' or
                 t.label() == 'V'):
 
@@ -85,6 +87,8 @@ for tree in trees:
 
             if not sentencepart:
                 sentencepart = 'Unusable'
+            elif sentencepart == 'Subject':
+                print("Interpreting keyword: %s" % sentencemodel.keyword)
 
             print("  %-16s - %s" % (as_string, sentencepart))
 
