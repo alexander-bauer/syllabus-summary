@@ -7,6 +7,9 @@ class Sentence:
         self.keyword = None
         self.data = None
 
+        # Iterator or generator for possible keyword matches.
+        self.subject_iter = None
+
     def include_word(self, word):
         # If the keyword has not yet been found, look for it.
         if self.keyword == None:
@@ -23,17 +26,19 @@ class Sentence:
         if self.keyword != None:
             return False
 
-        score, kw = self.kwlist.match(subject)
-        if kw != None:
-            self.keyword = kw
-            if kw.datatype != None:
-                self.data = kw.datatype
-            else:
-                self.data = datatype.DataType(None, 0)
+        matches = self.kwlist.all_matches(subject)
+        if matches:
+            self.subject_iter = (pair[1] for pair in matches)
+
+            self.next_subject();
 
             return 'Subject'
         else:
             return False
+
+    def next_subject(self):
+        self.keyword = next(self.subject_iter)
+        self.data = self.keyword.datatype()
 
     def new_object(self, obj):
         """Try to add the given value as an object. This should not be
@@ -45,7 +50,6 @@ class Sentence:
             return False
         
         try:
-            print(self.data)
             self.data.enter_data(obj)
             return 'Object'
         except datatype.DataType.ConstructorException as e:

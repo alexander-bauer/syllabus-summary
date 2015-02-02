@@ -24,7 +24,7 @@ compare_threshold = 3
 keywordlist = keyword.KeywordList([
     keyword.Keyword("course id", "catalog id",
         datamodel = datatype.CourseID(1)),
-    keyword.Keyword("start date", "start day",
+    keyword.Keyword("start date", "start day", "starts",
         datamodel = datatype.Date(1)),
     keyword.Keyword("end date", "end day",
         datamodel = datatype.Date(1)),
@@ -56,32 +56,44 @@ for index, tree in enumerate(trees):
             raw_sentences[index].replace('\n', ' '))
     for subtree in tree.subtrees(filter = lambda t: t.label() == 'NPR'):
         print("  %s" % subtree)
-    print(tree)
 
     # Now, parse the key elements, identifying the subject and
     # object(s).
     print("Key elements:")
     sentencemodel = parser.sentence.Sentence(keywordlist)
-    for subtree in tree.subtrees(filter = lambda t: t.label() == 'N' or
-            t.label() == 'V'):
+    # Re-process the sentence until we can get some data out of it.
+    # Usually, we'll break on the first try.
+    while True:
+        for subtree in tree.subtrees(filter = lambda t: t.label() == 'N' or
+                t.label() == 'V'):
 
-        # Return the element to string form, and then try to compare it
-        # with the keyword list, if a subject has not already been
-        # found.
-        as_string = ' '.join(word for (word, tag) in subtree.leaves())
+            # Return the element to string form, and then try to compare it
+            # with the keyword list, if a subject has not already been
+            # found.
+            as_string = ' '.join(word for (word, tag) in subtree.leaves())
 
-        # If the subtree is a verb, then it cannot be an object, so try
-        # to add it as a subject. Otherwise, add it as either.
-        if subtree.label() == 'V':
-            sentencepart = sentencemodel.new_subject(as_string)
+            # If the subtree is a verb, then it cannot be an object, so try
+            # to add it as a subject. Otherwise, add it as either.
+            if subtree.label() == 'V':
+                sentencepart = sentencemodel.new_subject(as_string)
+            else:
+                try:
+                    sentencepart = sentencemodel.include_word(as_string)
+                except datatype.DataType.ConstructorException as e:
+                    sentencepart = "Error: %s" % e
+
+            if not sentencepart:
+                sentencepart = 'Unusable'
+
+            print("  %-16s - %s" % (as_string, sentencepart))
+
+        if len(sentencemodel.data) == 0:
+            try:
+                sentencemodel.next_subject()
+            except StopIteration:
+                break
         else:
-            print(as_string)
-            sentencepart = sentencemodel.include_word(as_string)
-
-        if not sentencepart:
-            sentencepart = 'Unusable'
-
-        print("  %-16s - %s" % (as_string, sentencepart))
+            break
 
     # Record the subject and objects from this sentence, if they are
     # both nonempty.
