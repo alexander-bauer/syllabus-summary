@@ -4,13 +4,14 @@ import nltk
 # sentences.
 # TODO: Look into using exclusive grammars to discard prepositional
 # phrases, and such.
-_chunk_parser_ = nltk.RegexpParser("""
+_chunk_parser_ = nltk.RegexpParser(r"""
 EMAIL: {<NN><:><JJ>}
 V: {<RB|RBR|RBS>*<VB|VBD|VBN|VBP|VBZ>}
 N: {<NN|NNS|NNP|NNPS|CD|EMAIL>+}
-NP: {<DT|PRP>?<N>}
-VP: {<V><NP>?}
-NPR: {((<DT|PRP\$>)?<JJ>*(<NP|CC>)+)}
+PPR: {<IN>}
+NP: {<DT|PRP|PRP\$>?<JJ>*<N>?(<,>?<CC>?<N>)*}
+VP: {<V><PPR>?<NP>?}
+INDEP: {(<NP><VP>|<VP><NP>)}
 """)
 
 def identify_constructs(sentences):
@@ -19,3 +20,13 @@ def identify_constructs(sentences):
         sentences = [sentences]
 
     return [_chunk_parser_.parse(sentence) for sentence in sentences]
+
+def independent_clauses(sentences):
+    """Returns a flat list containing all independent clauses."""
+    clauses = []
+    trees = identify_constructs(sentences)
+    for tree in trees:
+        clauses.extend(tree.subtrees(lambda t: t.label() == "INDEP"))
+
+    print(clauses)
+    return clauses
