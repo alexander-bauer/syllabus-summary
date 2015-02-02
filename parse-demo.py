@@ -49,11 +49,12 @@ raw_sentences = parser.tokenize.split_phrases(data)
 sentences = parser.tokenize.part_of_speech_tag(
         parser.tokenize.split_words(raw_sentences))
 
-trees = parser.grammar.identify_constructs(sentences)
+trees = parser.grammar.independent_clauses(sentences)
 
-for index, tree in enumerate(trees):
-    print("===\nSentence: %s\nNoun phrases:" %
-            raw_sentences[index].replace('\n', ' '))
+
+for tree in trees:
+    print("===\nClause: %s\nNoun phrases:" % ' '.join(word for (word,
+        tag) in tree.leaves()))
     for subtree in tree.subtrees(filter = lambda t: t.label() == 'NPR'):
         print("  %s" % subtree)
 
