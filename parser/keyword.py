@@ -12,7 +12,7 @@ class Keyword:
                 datatype.DataType):
             raise self.DataModelIncomplete("Data model not instance of \
 DataType (did you remember to construct one?): %s" % datamodel)
-        self.datatype = datamodel
+        self._datatype = datamodel
 
         if normalized:
             self.primary = word
@@ -69,6 +69,10 @@ DataType (did you remember to construct one?): %s" % datamodel)
 
         score, word = min(proximity_words, key = lambda pair: pair[0])
         return (score, word)
+
+    def datatype(self):
+        """Return a datatype instance for this keyword."""
+        return self._datatype()
 
 class KeywordList(list):
     def __init__(self, keyword_list):
